@@ -67,7 +67,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => Queueless\User::class,
+            'model' => Queueless\Employee::class,
         ],
 
         // 'users' => [
