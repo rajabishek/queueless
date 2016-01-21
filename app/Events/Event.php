@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace Queueless\Events;
 
 abstract class Event
 {
