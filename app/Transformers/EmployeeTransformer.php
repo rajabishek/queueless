@@ -4,7 +4,7 @@ namespace Queueless\Transformers;
 
 use Queueless\User;
 
-class UserTransformer extends Transformer 
+class EmployeeTransformer extends Transformer 
 {
     /**
      * Transform the given user
