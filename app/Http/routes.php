@@ -11,21 +11,13 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| This route group applies the "web" middleware group to every route
-| it contains. The "web" middleware group is defined in your HTTP
-| kernel and includes session state, CSRF protection, and more.
-|
-*/
-
-Route::group(['middleware' => ['web']], function () {
-    //
+Route::group(['namespace' => 'Api\v1','prefix' => 'api/v1'], function ($app)
+{	
+	Route::group(['namespace' => 'Auth'], function ($app)
+	{
+		Route::post('register','AuthController@postRegister');
+		Route::post('login','AuthController@postLogin');
+		Route::get('user', 'AuthController@getUser');
+		Route::get('token/validate', 'AuthController@validateToken');
+	});
 });
