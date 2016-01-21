@@ -157,6 +157,7 @@ return [
         Queueless\Providers\RouteServiceProvider::class,
         Queueless\Providers\RepositoryServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        Thomaswelton\LaravelGravatar\LaravelGravatarServiceProvider::class,
 
     ],
 
@@ -205,6 +206,7 @@ return [
         'View'      => Illuminate\Support\Facades\View::class,
         'JWTAuth'   => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'Gravatar'   => Thomaswelton\LaravelGravatar\Facades\Gravatar::class,
     ],
 
 ];
