@@ -2,22 +2,21 @@
 
 namespace Queueless\Mailers;
 
+use Queueless\Employee;
 use Queueless\Exceptions\InvalidContactInformationException;
-use Mail;
-use Queueless\User;
-use Subscription;
 
 class EmployeeMailer extends Mailer
 {
     /**
-     * Create a new abstract mailer instance.
+     * Set the employee entity on the EmployeeMailer instance.
      *
-     * @param \Queueless\User $user
+     * @param \Queueless\Employee $user
      */
-    public function __construct(User $user)
+    public function forUser(Employee $user)
     {
-        if(!is_object($user)){
-            throw new InvalidContactInformationException("A valid user object must be provided for delivering an email !");
+        if(!is_object($user))
+        {
+            throw new InvalidContactInformationException('A valid employee object must be provided for delivering an email.');
         }
 
         $this->to = $user->fullname;
@@ -25,5 +24,20 @@ class EmployeeMailer extends Mailer
         $this->organisation = $user->organisation;
         $this->data = $user->toArray();
         $this->data['organisation'] = $this->organisation->toArray();
+
+        return $this;
+    }
+
+    /**
+     * The method that delivers account verification link to registered employee
+     *
+     * @return \Queueless\Mailer\UserMailer
+     */
+    public function emailVerification()
+    {
+        $this->subject = 'Confirm your Queueless Account';
+        $this->view = 'emails.employees.email_verification';
+
+        return $this;
     }
 }
