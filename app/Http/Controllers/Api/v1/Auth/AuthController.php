@@ -3,48 +3,48 @@
 namespace Queueless\Http\Controllers\Api\v1\Auth;
 
 use Exception;
-use Queueless\User;
+use Queueless\Employee;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Queueless\Http\Controllers\ApiController;
 use Queueless\Exceptions\ValidationException;
-use Queueless\Repositories\UserRepositoryInterface;
-use Queueless\Transformers\UserTransformer;
+use Queueless\Repositories\EmployeeRepositoryInterface;
+use Queueless\Transformers\EmployeeTransformer;
 
 class AuthController extends ApiController
 {
     /**
-     * User repository.
+     * Employee repository.
      *
-     * @var \Queueless\Repositories\UserRepositoryInterface
+     * @var \Queueless\Repositories\EmployeeRepositoryInterface
      */
-    protected $users;
+    protected $employees;
 
     /**
      * Create a new AuthController instance.
      *
-     * @param \Queueless\Repositories\UserRepositoryInterface $tasks
+     * @param \Queueless\Repositories\EmployeeRepositoryInterface $tasks
      * @return void
      */
-    function __construct(UserRepositoryInterface $users)
+    function __construct(EmployeeRepositoryInterface $employees)
     {
-        $this->middleware('jwt.auth', ['only' => ['validateToken','getUser']]);
+        $this->middleware('jwt.auth', ['only' => ['validateToken','getEmployee']]);
 
-        $this->users = $users;
+        $this->employees = $employees;
     }
 
     /**
-     * Get the authenticated user.
+     * Get the authenticated employee.
      *
-     * @param \Queueless\Transformers\UserTransformer $userTransformer
+     * @param \Queueless\Transformers\EmployeeTransformer $employeeTransformer
      * @return \Illuminate\Http\Response
      */
-    public function getUser(UserTransformer $userTransformer)
+    public function getEmployee(EmployeeTransformer $employeeTransformer)
     {
-        $user = JWTAuth::parseToken()->authenticate();
+        $employee = JWTAuth::parseToken()->authenticate();
 
-        return $this->respondWithSuccess($userTransformer->transform($user->toArray()));
+        return $this->respondWithSuccess($employeeTransformer->transform($employee->toArray()));
     }
 
     /**
@@ -116,14 +116,14 @@ class AuthController extends ApiController
         {
             $this->validate($request, [
                 'email' => 'required|max:255',
-                'email' => 'required|email|max:255|unique:users',
+                'email' => 'required|email|max:255|unique:employees',
                 'password' => 'required|confirmed|min:4',
             ]);
 
             $data = $request->only('name','email','password');
-            $user = $this->users->create($data);
+            $employee = $this->employees->create($data);
             
-            $token = JWTAuth::fromUser($user);
+            $token = JWTAuth::fromUser($employee);
             return $this->respondWithSuccess(compact('token'));
         }
         catch(ValidationException $e)
