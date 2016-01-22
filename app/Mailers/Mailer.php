@@ -2,16 +2,17 @@
 
 namespace Queueless\Mailers;
 
+use Mail;
+use Queueless\Employee;
+use Queueless\Organisation;
 use Queueless\Exceptions\InvalidContactInformationException;
-use Queueless\Models\Organisation;
-use Illuminate\Contracts\Mail\Mailer;
 
 abstract class Mailer
 {
     /**
      * The organisation that the use belongs to.
      *
-     * @var \Queueless\Models\Organisation
+     * @var \Queueless\Organisation
      */
     protected $organisation;
 
@@ -80,11 +81,11 @@ abstract class Mailer
      *
      * @return boolean
      */
-    public function deliver(Mailer $mailer)
+    public function deliver()
     {
         if(! $this->queue){
 
-            return $mailer->send($this->view,$this->data,function($message){
+            return Mail::send($this->view,$this->data,function($message){
                 $message->to($this->email,$this->to)->subject($this->subject);
                 
                 if(is_callable($this->options)){
@@ -98,7 +99,7 @@ abstract class Mailer
         $subject = $this->subject;
         $options = $this->options;
 
-        return $mailer->queue($this->view,$this->data,function($message) use($email,$to,$subject,$options){
+        return Mail::queue($this->view,$this->data,function($message) use($email,$to,$subject,$options){
             $message->to($email,$to)->subject($subject);
             
             if(is_callable($options)){
