@@ -40,7 +40,7 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
      * Create a new employee in the database.
      *
      * @param  array $data
-     * @return \Helpsmile\User
+     * @return \Queueless\User
      */
     public function createForOrganisation(array $data, Organisation $organisation)
     {
@@ -57,7 +57,7 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
         if(isset($data['address']) && $data['address'])
             $employee->address  = $data['address'];
         
-        $organisation->users()->save($employee);
+        $organisation->employees()->save($employee);
 
         // $role = Role::where('name',$data['designation'])->first();
         // $employee->attachRole($role);
