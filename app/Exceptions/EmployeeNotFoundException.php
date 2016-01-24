@@ -2,7 +2,7 @@
 
 namespace Queueless\Exceptions;
 
-class UserNotFoundException extends AbstractNotFoundException
+class EmployeeNotFoundException extends AbstractNotFoundException
 {
 
 }
