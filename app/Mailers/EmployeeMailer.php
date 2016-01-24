@@ -40,4 +40,17 @@ class EmployeeMailer extends Mailer
 
         return $this;
     }
+
+    /**
+     * The method that delivers a welcome email
+     *
+     * @return \Queueless\Mailer\UserMailer
+     */
+    public function welcome()
+    {
+        $this->subject = 'Welcome to Queueless';
+        $this->view = 'emails.employees.welcome';
+
+        return $this;
+    }
 }
