@@ -16,28 +16,34 @@
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <h3 class="panel-title">Sign In</h3>
-                        <a href="{{ url('/password/reset') }}" style="color:white; float:right; font-size: 85%; position: relative; top:-18px">Forgot Your Password?</a>
+                        <a href="{{ route('password.getEmail',$domain) }}" style="color:white; float:right; font-size: 85%; position: relative; top:-18px">Forgot Your Password?</a>
                     </div>
                     <div class="panel-body">
-                        <form role="form" method="POST" action="{{ route('auth.getLogin') }}">
+
+                        @include('flash::message')
+
+                        {{ Form::open(['route' => ['auth.postLogin', $domain],'role'=>'form']) }}
                             <fieldset>
-                                {!! csrf_field() !!}
+                                {{ Form::token() }}
                                 <div class="form-group {{set_error('email', $errors)}}">
-                                    <label for="email">Email Address</label>
-                                    <input type="email" class="form-control input-sm" name="email" value="{{ old('email') }}" id="email">
+                                    {{ Form::label('email','Email Address') }}
+                                    {{ Form::email('email',null,['class'=>'form-control input-sm']) }}
                                     {!! get_error('email', $errors) !!}
                                 </div>
                                 <div class="form-group {{set_error('password', $errors)}}">
-                                    <label for="password">Password</label>
-                                    <input type="password" class="form-control input-sm" name="password">
+                                    {{ Form::label('password','Password') }}
+                                    {{ Form::password('password',['class'=>'form-control input-sm']) }}
                                     {!! get_error('password', $errors) !!}
                                 </div>
                                 <div class="form-group">
                                     <div class="checkbox">
                                         <label>
-                                            <input type="checkbox" name="remember"> Remember Me
+                                            {{ Form::checkbox('remember',null) }} Remember Me
                                         </label>
                                     </div>
+                                </div>
+                                <div class="form-group">
+                                    {{ Form::submit('Log In',['class'=>'btn btn-sm btn-info']) }}
                                 </div>
                                 <hr style="margin-top:10px;margin-bottom:10px;">
                                 <div class="form-group">
@@ -47,7 +53,7 @@
                                     </div>
                                 </div> 
                             </fieldset>
-                        </form>
+                        {{ Form::close() }}
                     </div>
                 </div>
             </div>
