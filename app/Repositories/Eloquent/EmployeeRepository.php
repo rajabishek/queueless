@@ -37,10 +37,79 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
     }
 
     /**
+     * Find all employees paginated.
+     *
+     * @param  Queueless\Organisation $organisation
+     * @param  int  $perPage
+     * @return Illuminate\Database\Eloquent\Collection|\Queueless\Employee[]
+     */
+    public function findAllPaginatedForOrganisation($organisation, $perPage = 8)
+    {
+        return $organisation->employees()
+                    ->where('designation','!=','Admin')
+                    ->orderBy('created_at', 'desc')
+                    ->paginate($perPage);
+    }
+
+   /**
+     * Find the employee by the given id belonging to the given organisation.
+     *
+     * @param  int  $id
+     * @param  \Queueless\Organisation $organisation
+     * @return \Queueless\Employee
+     */
+    public function findByIdForOrganisation($id, Organisation $organisation)
+    {
+        $employee = $organisation->employees()->find($id);
+
+        if(is_null($employee))
+            throw new EmployeeNotFoundException('The employee with id as "'.$id.'" does not exist!');
+
+        return $employee;
+    }
+
+    /**
+     * Find the admin belonging to the given organisation.
+     *
+     * @param  int  $id
+     * @param  \Queueless\Organisation $organisation
+     * @return \Queueless\Employee
+     */
+    public function getAdminForOrganisation(Organisation $organisation)
+    {
+        $employee = $organisation->employees()
+                                ->with('organisation')
+                                ->where('designation','Admin')
+                                ->first();
+
+        if(is_null($employee))
+            throw new EmployeeNotFoundException("The employee with id as $id does not exist!");
+
+        return $employee;
+    }
+
+    /**
+     * Find the employee by the given email address from the given organisation.
+     *
+     * @param  int  $email
+     * @param  \Queueless\Organisation  $organisation
+     * @return \Queueless\Employee
+     */
+    public function findByEmailForOrganisation($email, Organisation $organisation)
+    {
+        $employee = $organisation->employees()->where('email',$email)->first();
+
+        if(is_null($employee))
+            throw new EmployeeNotFoundException("The employee having email as $email does not exist, for {$organisation->name}");
+
+        return $employee;
+    }
+
+    /**
      * Create a new employee in the database.
      *
      * @param  array $data
-     * @return \Queueless\User
+     * @return \Queueless\Employee
      */
     public function createForOrganisation(array $data, Organisation $organisation)
     {
