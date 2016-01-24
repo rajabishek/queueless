@@ -156,9 +156,12 @@ return [
         Queueless\Providers\EventServiceProvider::class,
         Queueless\Providers\RouteServiceProvider::class,
         Queueless\Providers\RepositoryServiceProvider::class,
+        Queueless\Providers\ReportingServiceProvider::class,
+        Queueless\Providers\NavigationServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
         Thomaswelton\LaravelGravatar\LaravelGravatarServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class,
 
     ],
 
@@ -209,6 +212,8 @@ return [
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'Gravatar'  => Thomaswelton\LaravelGravatar\Facades\Gravatar::class,
         'Flash'     => Laracasts\Flash\Flash::class,
+        'Form'      => Collective\Html\FormFacade::class,
+        'Html'      => Collective\Html\HtmlFacade::class,
     ],
 
 ];
