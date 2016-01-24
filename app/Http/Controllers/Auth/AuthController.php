@@ -8,6 +8,10 @@ use Queueless\Http\Controllers\Controller;
 use Queueless\Mailers\EmployeeMailer;
 use Queueless\Repositories\EmployeeRepositoryInterface;
 use Queueless\Repositories\OrganisationRepositoryInterface;
+use Queueless\Exceptions\InvalidConfirmationCodeException;
+use Queueless\Exceptions\EmployeeNotFoundException;
+use Queueless\Exceptions\OrganisationNotFoundException;
+
 
 class AuthController extends Controller
 {
@@ -16,7 +20,7 @@ class AuthController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/employees';
+    protected $redirectTo = '/admin/users';
 
     /**
      * Auth manager instance to manage the authetication.
@@ -109,13 +113,54 @@ class AuthController extends Controller
     }
 
     /**
+     * Confirm the confirmation code and login the registered user
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function confirm($confirmationCode)
+    {
+        try{
+            if(!$confirmationCode)
+                throw new InvalidConfirmationCodeException;
+
+            $organisation = $this->organisations->findByConfirmationCode($confirmationCode);
+
+            $organisation->confirmed = true;
+            $organisation->confirmation_code = null;
+            $organisation->save();
+
+            //Email the user confirmating account creation
+            $user = $this->employees->getAdminForOrganisation($organisation);
+            app(EmployeeMailer::class)->forUser($user)
+                                      ->welcome()
+                                      ->queue()->deliver(); 
+
+            flash()->message('You have successfully verified your account. Please log in.');
+            return redirect()->route('auth.getLogin',$organisation->domain);
+        }
+        catch(InvalidConfirmationCodeException $e)
+        {
+            return view('errors.403'); //404
+        }
+        catch(EmployeeNotFoundException $e)
+        {
+            return view('errors.503'); //500
+        }
+        catch(OrganisationNotFoundException $e)
+        {
+            return view('errors.503'); //500
+        }
+    }
+
+    /**
      * Show the application login form.
      *
      * @return \Illuminate\Http\Response
      */
-    public function getLogin()
+    public function getLogin($domain)
     {
-        return view('auth.login');
+        $organisation = $this->organisations->findByDomain($domain);
+        return view('auth.login',compact('domain','organisation'));
     }
 
     /**
@@ -124,22 +169,23 @@ class AuthController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function postLogin(Request $request)
+    public function postLogin($domain, Request $request)
     {
         $this->validate($request, [
-            'username' => 'required', 
+            'email' => 'required', 
             'password' => 'required',
         ]);
 
-        $credentials = $request->only('username', 'password');
+        $credentials = $request->only('email', 'password');
 
-        if ($this->auth->attempt($credentials, $request->has('remember'))) {
-            return redirect()->intended($this->redirectPath());
+        if ($this->auth->attempt($credentials, $request->has('remember'))) 
+        {
+            return redirect()->intended(route('admin.users.index', $domain));
         }
 
         return redirect()->back()
-            ->withInput($request->only('username', 'remember'))
-            ->withErrors(['username' => 'These credentials do not match our records.']);      
+            ->withInput($request->only('email', 'remember'))
+            ->withErrors(['email' => 'These credentials do not match our records.']);      
     }
 
     /**
@@ -147,23 +193,67 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getLogout()
+    public function getLogout($domain)
     {
         $this->auth->logout();
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        return redirect()->route('auth.getLogin', $domain);
     }
 
     /**
-     * Get the post register / login redirect path.
+     * Present a form for resending the account verification email to the admin of the organisation.
      *
-     * @return string
+     * @return \Illuminate\Http\Response
      */
-    public function redirectPath()
+    public function getResend()
     {
-        if (property_exists($this, 'redirectPath')) {
-            return $this->redirectPath;
-        }
+        return view('auth.resend');
+    }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+    /**
+     * Resend the account verification email to the admin of the organisation.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function postResend(Request $request)
+    {
+        $this->validate($request, [
+            'domain' => 'required|alpha_num|max:20|exists:organisations,domain',
+            'email'  => 'required|email',
+        ]);
+        
+        try
+        {
+            $organisation = $this->organisations->findByDomain($request->get('domain'));
+            $user = $this->employees->findByEmailForOrganisation($request->get('email'), $organisation);
+
+            if($organisation->confirmed)
+            {
+                flash()->success("{$organisation->name}'s account is already verified, you may log in here.");
+                return redirect()->route('auth.getLogin',$organisation->domain);
+            }
+
+            if($user->hasRole('Admin'))
+            {
+                //Email the user
+                app(EmployeeMailer::class)->forUser($user)
+                                          ->emailVerification()
+                                          ->queue()->deliver(); 
+                
+                flash()->success('The verification email has been resent. Please check your email.');
+                return redirect()->back();
+            }
+            else 
+                throw new EmployeeNotFoundException;
+        }
+        catch(OrganisationNotFoundException $e)
+        {
+            flash()->error('The provided domain does not exist.');
+            return redirect()->back()->withInput();
+        }
+        catch(EmployeeNotFoundException $e)
+        {
+            flash()->error("The provided email address is not the same as {$organisation->name}'s admin.");
+            return redirect()->back()->withInput();
+        }
     }
 }
