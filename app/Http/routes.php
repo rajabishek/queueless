@@ -48,11 +48,11 @@ Route::group(['domain' => '{domain}.' . env('APP_DOMAIN','queueless.com'),'middl
 
         Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'designation:Admin'],function() 
         {
-            Route::get('users/import',['as' => 'admin.users.getImport','uses' => 'UsersController@getImport']);
-            Route::post('users/import',['as' => 'admin.users.postImport','uses' => 'UsersController@postImport']);
-            Route::get('users/download',['as' => 'admin.users.getDownload','uses' => 'UsersController@getDownload']);
-            Route::post('users/download',['as' => 'admin.users.postDownload','uses' => 'UsersController@postDownload']);
-            Route::resource('users', 'UsersController');
+            Route::get('users/import',['as' => 'admin.users.getImport','uses' => 'EmployeesController@getImport']);
+            Route::post('users/import',['as' => 'admin.users.postImport','uses' => 'EmployeesController@postImport']);
+            Route::get('users/download',['as' => 'admin.users.getDownload','uses' => 'EmployeesController@getDownload']);
+            Route::post('users/download',['as' => 'admin.users.postDownload','uses' => 'EmployeesController@postDownload']);
+            Route::resource('users', 'EmployeesController');
         });
     });
 

@@ -10,28 +10,28 @@ use Queueless\Services\Upload\ExcelUploadService;
 use Queueless\Exceptions\EmployeeNotFoundException;
 use Queueless\Reporting\FileReportGeneratorManager;
 
-class UsersController extends Controller
+class EmployeesController extends Controller
 {
 	/**
      * User repository.
      *
      * @var \Queueless\Repositories\EmployeeRepositoryInterface
      */
-    protected $users;
+    protected $employees;
 
     /**
-     * Create a new UsersController instance.
+     * Create a new EmployeesController instance.
      *
      * @param  \Queueless\Repositories\EmployeeRepositoryInterface $users
      * @return void
      */
-    public function __construct(EmployeeRepositoryInterface $users)
+    public function __construct(EmployeeRepositoryInterface $employees)
     {
-        $this->users = $users;
+        $this->employees = $employees;
     }
 
     /**
-     * Show the users index page.
+     * Show the employees index page.
      *
      * @return \Illuminate\Http\Response
      */
@@ -44,12 +44,12 @@ class UsersController extends Controller
         if($search)
         {
             $message = "Coudn't find any employees matching the term <strong>$search</strong> for you. We suggest you to go back and search for another term once more.";
-            $users = $this->users->searchByTermPaginatedForOrganisation($search,$request->user()->organisation);
+            $users = $this->employees->searchByTermPaginatedForOrganisation($search,$request->user()->organisation);
             $term = $search;
         }
         else
         {
-            $users = $this->users->findAllPaginatedForOrganisation($request->user()->organisation);
+            $users = $this->employees->findAllPaginatedForOrganisation($request->user()->organisation);
             $message = "You haven't added any employees, we suggest you to add one.";
             $term = 'All';
         }
@@ -149,7 +149,7 @@ class UsersController extends Controller
         {
             foreach ($users as $user) {
                 $user['password'] = 'password';
-                $this->users->createForOrganisation($user,$organisation);
+                $this->employees->createForOrganisation($user,$organisation);
             }
             return response()->json(['success' => true]);
 
@@ -170,7 +170,7 @@ class UsersController extends Controller
         $designationList = $this->getDesignationList();
 
         $genderList = ['Male' => 'Male','Female' => 'Female'];
-        $user = $this->users->findByIdForOrganisation($id,$request->user()->organisation);
+        $user = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
         return view('admin.users.edit',compact('domain','user','designationList','genderList'));
     }
 
@@ -183,7 +183,7 @@ class UsersController extends Controller
     {
         try
         {
-            $user = $this->users->findByIdForOrganisation($id,$request->user()->organisation);
+            $user = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
             
             if($user->hasRole('Admin'))
                 return redirect()->route('admin.users.index');
@@ -209,7 +209,7 @@ class UsersController extends Controller
         {
             $input = $request->all();
             $form->validate($input);
-            $user = $this->users->createForOrganisation($input,$request->user()->organisation);
+            $user = $this->employees->createForOrganisation($input,$request->user()->organisation);
             
             flash()->success("$user->fullname has been added as a $user->designation in your organisation.");
             return redirect()->route('admin.users.show',[$domain,$user->id]);
@@ -234,8 +234,8 @@ class UsersController extends Controller
         try
         {
             $form->validate($input);
-            $user = $this->users->findByIdForOrganisation($id,$request->user()->organisation);
-            $user = $this->users->edit($user,$input);
+            $user = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
+            $user = $this->employees->edit($user,$input);
 
             flash()->success("$user->fullname's details has been successfully updated.");
             return redirect()->route('admin.users.show',[$domain,$id]);
@@ -254,7 +254,7 @@ class UsersController extends Controller
      */
     public function destroy($domain, $id){
         
-        $user = $this->users->findByIdForOrganisation($id,$request->user()->organisation);
+        $user = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
         $user->delete();
 
         flash()->success("$user->fullname has been successfully removed as a $user->designation from your organisation.");
