@@ -21,20 +21,19 @@
                         
                         @include('flash::message')
 
-                        <form role="form" method="POST" action="{{ route('auth.getRegister') }}">
+                        {{ Form::open(['route' => 'auth.postRegister','role'=>'form']) }}
                             <fieldset>
-                                {!! csrf_field() !!}
-
+                                {{ Form::token() }}
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-xs-12 col-sm-6 {{set_error('email', $errors)}}">
-                                            <label for="email">Email Address ( Admin )</label>
-                                            <input type="email" class="form-control input-sm" name="email" value="{{ old('email') }}" id="email">
+                                            {{ Form::label('email','Email Address (Admin)') }}
+                                            {{ Form::email('email',null,['class'=>'form-control input-sm']) }}
                                             {!! get_error('email', $errors) !!}
                                         </div>
                                         <div class="col-xs-12 col-sm-6 {{set_error('fullname', $errors)}}">
-                                            <label for="fullname">Fullname</label>
-                                            <input type="text" class="form-control input-sm" name="fullname" value="{{ old('fullname') }}" id="fullname">
+                                            {{ Form::label('fullname','Fullname') }}
+                                            {{ Form::text('fullname',null,['class'=>'form-control input-sm']) }}
                                             {!! get_error('fullname', $errors) !!}
                                         </div>
                                     </div>
@@ -43,13 +42,13 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-xs-12 col-sm-6 {{set_error('password', $errors)}}">
-                                            <label for="password">Password</label>
-                                            <input type="password" class="form-control input-sm" name="password">
+                                            {{ Form::label('password','Password') }}
+                                            {{ Form::password('password',['class'=>'form-control input-sm']) }}
                                             {!! get_error('password', $errors) !!}
                                         </div>
                                         <div class="col-xs-12 col-sm-6 {{set_error('password_confirmation', $errors)}}">
-                                            <label for="password_confirmation">Confirm Password</label>
-                                            <input type="password" class="form-control input-sm" name="password_confirmation">
+                                            {{ Form::label('password_confirmation','Confirm Password') }}
+                                            {{ Form::password('password_confirmation',['class'=>'form-control input-sm']) }}
                                             {!! get_error('password_confirmation', $errors) !!}
                                         </div>
                                     </div>
@@ -58,13 +57,13 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-xs-12 col-sm-6 {{set_error('name', $errors)}}">
-                                            <label for="name">Organisation Name</label>
-                                            <input type="text" class="form-control input-sm" name="name" value="{{ old('name') }}" id="name">
+                                            {{ Form::label('name','Organisation Name') }}
+                                            {{ Form::text('name',null,['class'=>'form-control input-sm']) }}
                                             {!! get_error('name', $errors) !!}
                                         </div>
                                         <div class="col-xs-12 col-sm-6 {{set_error('domain', $errors)}}">
-                                            <label for="domain">Choose a company URL</label>
-                                             <input type="text" class="form-control input-sm" name="domain" value="{{ old('domain') }}" id="domain" size="20" style="padding-right: 120px">
+                                            {{ Form::label('domain','Choose a company URL') }}
+                                            {{ Form::text('domain',null,['class'=>'form-control input-sm','size'=>20,'style'=>'padding-right: 120px']) }}
                                              <span class="append">.queueless.com</span>
                                             {!! get_error('domain', $errors) !!}
                                         </div>
@@ -74,11 +73,11 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-xs-12 col-xs-6">
-                                            <button type="submit" class="btn btn-sm btn-success">Register</button>
+                                            {{ Form::submit('Register',['class'=>'btn btn-sm btn-success']) }}
                                         </div>
                                     </div>
                                 </div>
-                            </fieldset>
+                            {{ Form::close() }}
                         </form>
                     </div>
                 </div>
