@@ -32,6 +32,27 @@ class Employee extends Authenticatable
     }
 
     /**
+     * Check whether the user has the given role
+     *
+     * @return boolean
+     */
+    public function hasRole($role)
+    {
+        return $role == $this->designation;
+    }
+
+    /**
+     * Check the route of the home page
+     *
+     * @return string
+     */
+    public function getHomeRoute()
+    {
+        if($this->hasRole('Admin'))
+            return 'admin.users.index';
+    }
+
+    /**
      * Get the user's avatar image.
      *
      * @return string
