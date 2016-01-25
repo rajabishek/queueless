@@ -180,7 +180,7 @@ class AuthController extends Controller
 
         if ($this->auth->attempt($credentials, $request->has('remember'))) 
         {
-            return redirect()->intended(route('admin.users.index', $domain));
+            return redirect()->intended(route('admin.employees.index', $domain));
         }
 
         return redirect()->back()
