@@ -50,4 +50,13 @@ interface EmployeeRepositoryInterface
      * @return \Queueless\Employee
      */
     public function createForOrganisation(array $data, Organisation $organisation);
+
+    /**
+     * Update the employee in the database.
+     *
+     * @param  \Queueless\Employee $employee
+     * @param  array $data
+     * @return \Queueless\Employee
+     */
+    public function edit(Employee $employee, array $data);
 }
