@@ -71,7 +71,7 @@ class ExcelReportGenerator implements FileReportGenerator{
         $orderby = $this->orderby;
         $ordertype = $this->ordertype;
 
-        $data = $organisation->users()->select('email','fullname','address','mobile','designation')
+        $data = $organisation->employees()->select('email','fullname','address','mobile','designation')
                               ->orderBy($orderby,$ordertype)
                               ->take(100)
                               ->get();
