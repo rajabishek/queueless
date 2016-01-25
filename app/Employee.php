@@ -49,7 +49,7 @@ class Employee extends Authenticatable
     public function getHomeRoute()
     {
         if($this->hasRole('Admin'))
-            return 'admin.users.index';
+            return 'admin.employees.index';
     }
 
     /**
