@@ -4,7 +4,7 @@
         <div class="navbar-header">
             <!-- Branding Image -->
             @if(Auth::check())
-                <a class="navbar-brand" href="{{ route('admin.users.index', $domain) }}">Queueless</a>
+                <a class="navbar-brand" href="{{ route('admin.employees.index', $domain) }}">Queueless</a>
             @else
                 <a class="navbar-brand" href="{{ route('pages.home') }}">Queueless</a>
             @endif
