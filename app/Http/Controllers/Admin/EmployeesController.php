@@ -22,7 +22,7 @@ class EmployeesController extends Controller
     /**
      * Create a new EmployeesController instance.
      *
-     * @param  \Queueless\Repositories\EmployeeRepositoryInterface $users
+     * @param  \Queueless\Repositories\EmployeeRepositoryInterface $employees
      * @return void
      */
     public function __construct(EmployeeRepositoryInterface $employees)
@@ -44,17 +44,17 @@ class EmployeesController extends Controller
         if($search)
         {
             $message = "Coudn't find any employees matching the term <strong>$search</strong> for you. We suggest you to go back and search for another term once more.";
-            $users = $this->employees->searchByTermPaginatedForOrganisation($search,$request->user()->organisation);
+            $employees = $this->employees->searchByTermPaginatedForOrganisation($search,$request->user()->organisation);
             $term = $search;
         }
         else
         {
-            $users = $this->employees->findAllPaginatedForOrganisation($request->user()->organisation);
+            $employees = $this->employees->findAllPaginatedForOrganisation($request->user()->organisation);
             $message = "You haven't added any employees, we suggest you to add one.";
             $term = 'All';
         }
 
-        return view('admin.users.index', compact('domain','users','designationList','term','message'));
+        return view('admin.employees.index', compact('domain','employees','designationList','term','message'));
     }
 
     /**
@@ -82,7 +82,7 @@ class EmployeesController extends Controller
     {
         $genderList = ['Male' => 'Male','Female' => 'Female'];
         
-        return view('admin.users.create',compact('domain','genderList'));
+        return view('admin.employees.create',compact('domain','genderList'));
     }
 
     /**
@@ -102,7 +102,7 @@ class EmployeesController extends Controller
             'desc' => 'Descending',
         ];
 
-        return view('admin.users.download',compact('domain','orderByList','orderTypeList'));
+        return view('admin.employees.download',compact('domain','orderByList','orderTypeList'));
     }
 
     /**
@@ -119,45 +119,7 @@ class EmployeesController extends Controller
                  ->ordertype($ordertype)
                  ->getEmployeeDetailsForOrganisation($request->user()->organisation);
         
-        return redirect()->route('admin.users.getDownload',$domain);
-    }
-
-    /**
-     * Present a form for importing employee data into application
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getImport($domain)
-    {
-        return view('admin.users.import',compact('domain'));
-    }
-
-    /**
-     * Upload the users data to the database from the uploaded file
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Queueless\Services\Upload\ExcelUploadService $uploader
-     * @return \Illuminate\Http\Response
-     */
-    public function postImport($domain, Request $request, ExcelUploadService $uploader)
-    {
-        $organisation = $request->user()->organisation;
-        $uploader = $uploader->forOrganisation($organisation);
-        $users = $uploader->handle($request->file('file'));
-
-        if($users)
-        {
-            foreach ($users as $user) {
-                $user['password'] = 'password';
-                $this->employees->createForOrganisation($user,$organisation);
-            }
-            return response()->json(['success' => true]);
-
-        }
-        else
-        {
-            return response()->json(['success' => false,'errors' => $uploader->getErrors()]);
-        }
+        return redirect()->route('admin.employees.getDownload',$domain);
     }
 
     /**
@@ -165,13 +127,13 @@ class EmployeesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit($domain, $id){
-        
-        $designationList = $this->getDesignationList();
-
-        $genderList = ['Male' => 'Male','Female' => 'Female'];
-        $user = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
-        return view('admin.users.edit',compact('domain','user','designationList','genderList'));
+    public function edit($domain, $id, Request $request)
+    {    
+        $employee = $this->employees->findByIdForOrganisation(
+            $id,
+            $request->user()->organisation
+        );
+        return view('admin.employees.edit',compact('domain','employee'));
     }
 
     /**
@@ -179,20 +141,20 @@ class EmployeesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show($domain, $id)
+    public function show($domain, $id, Request $request)
     {
         try
         {
-            $user = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
+            $employee = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
             
-            if($user->hasRole('Admin'))
-                return redirect()->route('admin.users.index');
+            if($employee->hasRole('Admin'))
+                return redirect()->route('admin.employees.index');
             
-            return view('admin.users.show',compact('domain','user'));
+            return view('admin.employees.show',compact('domain','employee'));
         }
         catch(EmployeeNotFoundException $e)
         {
-            $backLink = route('admin.users.index',$domain);
+            $backLink = route('admin.employees.index',$domain);
             return view('errors.employeenotfound',compact('domain','backLink'));
         }
     }
@@ -203,22 +165,26 @@ class EmployeesController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store($domain, AddEmployeeForm $form, Request $request)
+    public function store($domain, Request $request)
     {
-        try
-        {
-            $input = $request->all();
-            $form->validate($input);
-            $user = $this->employees->createForOrganisation($input,$request->user()->organisation);
-            
-            flash()->success("$user->fullname has been added as a $user->designation in your organisation.");
-            return redirect()->route('admin.users.show',[$domain,$user->id]);
-        }
-        catch(FormValidationException $e)
-        {
-            flash()->error('Please review the following errors.');
-            return redirect()->back()->withInput()->withErrors($e->getErrors());
-        }
+        $rules = [
+            'email'  => 'required|email|unique:employees',
+            'fullname'  => 'required',
+            'password' => 'required|min:5|confirmed',
+            'password_confirmation' => 'required'
+        ];
+
+        if($request->get('mobile'))
+            $rules['mobile'] = 'required|numeric|digits:10|unique:employees';
+
+        $this->validate($request, $rules);
+        $employee = $this->employees->createForOrganisation(
+            $request->all(),
+            $request->user()->organisation
+        );
+        
+        flash()->success("$employee->fullname has been added as an employee in your organisation.");
+        return redirect()->route('admin.employees.show',[$domain,$employee->id]);
     }
 
     /**
@@ -226,25 +192,32 @@ class EmployeesController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update($domain, $id, EmployeeUpdateForm $form, Request $request)
+    public function update($domain, $id, Request $request)
     {
-        $input = $request->all();
-        $input['id'] = $id;
+        $rules = [
+            'email'  => 'required|email',
+            'fullname'  => 'required'
+        ];
 
-        try
-        {
-            $form->validate($input);
-            $user = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
-            $user = $this->employees->edit($user,$input);
+        $rules['email'] = "required|email|unique:employees,email,{$id}";
+        $rules['mobile'] = "unique:employees,mobile,{$id}";
+        
+        if($request->get('password'))
+            $rules['password'] = 'required|confirmed';
 
-            flash()->success("$user->fullname's details has been successfully updated.");
-            return redirect()->route('admin.users.show',[$domain,$id]);
-        }
-        catch(FormValidationException $e)
-        {
-            flash()->error('Please review the following errors.');
-            return redirect()->back()->withInput()->withErrors($e->getErrors());
-        }
+        if($request->get('designation'))
+            $rules['designation'] = 'required|in:Employee';
+
+        $this->validate($request, $rules);
+
+        $employee = $this->employees->findByIdForOrganisation(
+            $id,
+            $request->user()->organisation
+        );
+        $employee = $this->employees->edit($employee,$request->all());
+
+        flash()->success("{$employee->fullname}'s details has been successfully updated.");
+        return redirect()->route('admin.employees.show',[$domain,$id]);
     }
 
     /**
@@ -254,10 +227,10 @@ class EmployeesController extends Controller
      */
     public function destroy($domain, $id){
         
-        $user = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
-        $user->delete();
+        $employee = $this->employees->findByIdForOrganisation($id,$request->user()->organisation);
+        $employee->delete();
 
-        flash()->success("$user->fullname has been successfully removed as a $user->designation from your organisation.");
-        return redirect()->route('admin.users.index',$domain);
+        flash()->success("$employee->fullname has been successfully removed as a $employee->designation from your organisation.");
+        return redirect()->route('admin.employees.index',$domain);
     }
 }
