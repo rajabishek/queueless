@@ -18,7 +18,7 @@ class Builder
      * @param  string $type
      * @return string
      */
-    public function make($organisation, $url, $type = 'adminmenu')
+    public function make($organisation, $url, $type = 'adminmenu-top')
     {
         $this->organisation = $organisation;
 
@@ -75,9 +75,9 @@ class Builder
      */
     protected function getNavigationItem(array $item, $isActive)
     {
-        $anchor = $this->getItemAnchor($item, $isActive);
+        $anchor = $this->getItemAnchor($item);
 
-        return $this->wrapAnchor($anchor);
+        return $this->wrapAnchor($anchor, $isActive);
     }
 
     /**
@@ -86,18 +86,18 @@ class Builder
      * @param  array  $item
      * @return string
      */
-    protected function getItemAnchor(array $item, $isActive)
+    protected function getItemAnchor(array $item)
     {
         if(isset($item['glyphicon']))
             $inner = '<i class="'.$item['glyphicon'].'"></i><span class="sidebar-mini-hide"> ';
         else
             $inner = '';
             
-        $class = $isActive ? ' class="active"' : '';
+        
         if($this->organisation)
-            $anchor = '<a'. $class . ' href="'.route($item['route'],$this->organisation).'">'.$inner.$item['label'].'</a>';
+            $anchor = '<a href="'.route($item['route'],$this->organisation).'">'.$inner.$item['label'].'</a>';
         else
-            $anchor = '<a'. $class . ' href="'.route($item['route']).'">'.$inner.$item['label'].'</a>';
+            $anchor = '<a href="'.route($item['route']).'">'.$inner.$item['label'].'</a>';
         return $anchor;
     }
 
@@ -108,8 +108,10 @@ class Builder
      * @param  bool    $isActive
      * @return string
      */
-    protected function wrapAnchor($anchor)
-    {
-        return '<li>' . $anchor . '</li>';
+    protected function wrapAnchor($anchor, $isActive)
+    { 
+        $class = $isActive ? ' class="active"' : '';
+        
+        return '<li'. $class . '>' . $anchor . '</li>';
     }
 }
