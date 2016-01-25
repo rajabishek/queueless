@@ -118,7 +118,7 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
         $employee->email        = $data['email'];
         $employee->fullname     = $data['fullname'];
         $employee->password     = $this->hasher->make($data['password']);
-        $employee->designation  = $data['designation'];
+        $employee->designation  = isset($data['designation']) ? $data['designation'] : 'Employee';
         
         if(isset($data['mobile']) && $data['mobile'])
             $employee->mobile  = $data['mobile'];
@@ -130,6 +130,37 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
 
         // $role = Role::where('name',$data['designation'])->first();
         // $employee->attachRole($role);
+
+        return $employee;
+    }
+
+    /**
+     * Update the employee in the database.
+     *
+     * @param  \Queueless\Employee $employee
+     * @param  array $data
+     * @return \Queueless\Employee
+     */
+    public function edit(Employee $employee, array $data)
+    {
+
+        //In setting page the employee is not allowed to change his email or designation
+        if(isset($data['email']))
+            $employee->email  = $data['email'];
+        
+        if(isset($data['designation']))
+            $employee->designation  = $data['designation'];
+        
+        $employee->fullname     = $data['fullname'];
+        $employee->mobile  = $data['mobile'];
+        $employee->address  = $data['address'];
+
+        //Sometimes the admin can update other details apart from the password
+        //Update the password only if the admin does it.
+        if(isset($data['password']))
+            $employee->password = $this->hasher->make($data['password']);
+
+        $employee->save();
 
         return $employee;
     }
