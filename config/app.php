@@ -162,7 +162,7 @@ return [
         Thomaswelton\LaravelGravatar\LaravelGravatarServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
-
+        Maatwebsite\Excel\ExcelServiceProvider::class,
     ],
 
     /*
@@ -214,6 +214,8 @@ return [
         'Flash'     => Laracasts\Flash\Flash::class,
         'Form'      => Collective\Html\FormFacade::class,
         'Html'      => Collective\Html\HtmlFacade::class,
+        'Excel'     => Maatwebsite\Excel\Facades\Excel::class,
+        'Navigation' => Queueless\Facades\Navigation::class,
     ],
 
 ];
