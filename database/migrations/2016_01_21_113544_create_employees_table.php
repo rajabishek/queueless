@@ -25,6 +25,7 @@ class CreateEmployeesTable extends Migration
             $table->string('mobile')->nullable();
             $table->enum('designation', ['Admin','Employee']);
             $table->string('profile')->nullable();
+            $table->enum('status',['Free','Busy','Offline'])->default('Offline');
 
             $table->rememberToken();
             $table->timestamps();
