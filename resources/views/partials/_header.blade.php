@@ -3,11 +3,7 @@
     <div class="container">
         <div class="navbar-header">
             <!-- Branding Image -->
-            @if(Auth::check())
-                <a class="navbar-brand" href="{{ route('admin.employees.index', $domain) }}">Queueless</a>
-            @else
-                <a class="navbar-brand" href="{{ route('pages.home') }}">Queueless</a>
-            @endif
+            <a class="navbar-brand" href="{{ route('pages.home') }}">Queueless</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             @if(Auth::guest())
