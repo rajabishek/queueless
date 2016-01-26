@@ -56,6 +56,8 @@ Route::group(['domain' => '{domain}.' . env('APP_DOMAIN','queueless.com'),'middl
             Route::post('settings/changeProfile',['as' => 'admin.settings.changeProfile','uses' => 'SettingsController@changeProfile']);
             Route::resource('settings', 'SettingsController',['only' => ['index','store']]);
         });
+
+        Route::resource('users','UsersController');
     });
 
     Route::group(['namespace' => 'Api\v1','prefix' => 'api/v1'], function ($app)
