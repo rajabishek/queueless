@@ -36,7 +36,7 @@ class EmployeeMailer extends Mailer
     public function emailVerification()
     {
         $this->subject = 'Confirm your Queueless Account';
-        $this->view = 'emails.employees.email_verification';
+        $this->view = 'auth.emails.email-verification';
 
         return $this;
     }
@@ -49,7 +49,20 @@ class EmployeeMailer extends Mailer
     public function welcome()
     {
         $this->subject = 'Welcome to Queueless';
-        $this->view = 'emails.employees.welcome';
+        $this->view = 'auth.emails.welcome';
+
+        return $this;
+    }
+
+    /**
+     * Notif the user after the password has changed for him
+     *
+     * @return \Helpsmile\Mailer\UserMailer
+     */
+    public function passwordChanged()
+    {
+        $this->subject = 'Password Changed';
+        $this->view = 'auth.emails.password-changed';
 
         return $this;
     }
