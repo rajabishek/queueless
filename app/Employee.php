@@ -24,11 +24,21 @@ class Employee extends Authenticatable
     /**
      * A user belongs to an organisation.
      *
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function organisation()
     {
         return $this->belongsTo('Queueless\Organisation');
+    }
+
+    /**
+     * An employee can have appointment with different users.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function users()
+    {
+        return $this->belongsToMany('Queueless\User')->withTimestamps();
     }
 
     /**
