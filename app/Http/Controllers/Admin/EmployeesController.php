@@ -5,15 +5,15 @@ namespace Queueless\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use Queueless\Http\Requests;
 use Queueless\Http\Controllers\Controller;
-use Queueless\Repositories\EmployeeRepositoryInterface;
 use Queueless\Services\Upload\ExcelUploadService;
+use Queueless\Repositories\EmployeeRepositoryInterface;
 use Queueless\Exceptions\EmployeeNotFoundException;
 use Queueless\Reporting\FileReportGeneratorManager;
 
 class EmployeesController extends Controller
 {
 	/**
-     * User repository.
+     * Employee repository.
      *
      * @var \Queueless\Repositories\EmployeeRepositoryInterface
      */
