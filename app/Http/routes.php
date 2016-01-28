@@ -57,6 +57,8 @@ Route::group(['domain' => '{domain}.' . env('APP_DOMAIN','queueless.com'),'middl
             Route::resource('settings', 'SettingsController',['only' => ['index','store']]);
         });
 
+        Route::get('employees/{id}/appointments',['as' => 'employees.appointments.request','uses' => 'AppointmentController@next']);
+        Route::get('users/{id}/appointments',['as' => 'users.appointments.request','uses' => 'AppointmentController@request']);
         Route::resource('users','UsersController');
     });
 
