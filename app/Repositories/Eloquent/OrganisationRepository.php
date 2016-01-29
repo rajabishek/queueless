@@ -2,7 +2,6 @@
 
 namespace Queueless\Repositories\Eloquent;
 
-use Queueless\User;
 use Queueless\Organisation;
 use Queueless\Repositories\OrganisationRepositoryInterface;
 use Queueless\Exceptions\OrganisationNotFoundException;
@@ -50,6 +49,17 @@ class OrganisationRepository extends AbstractRepository implements OrganisationR
             throw new OrganisationNotFoundException("The organisation having confirmation code as $confirmationCode does not exist.");
 
         return $organisation;
+    }
+
+    /**
+     * Does the organisation have users in the queue.
+     *
+     * @param  \Queueless\Organisation $organisation
+     * @return boolean
+     */
+    public function doesHaveUsersInQueue(Organisation $organisation)
+    {
+        return $organisation->users()->count() > 0;
     }
 
     /**
