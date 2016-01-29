@@ -36,31 +36,15 @@ class UserRepository extends AbstractRepository implements UserRepositoryInterfa
         $this->hasher = $hasher;
     }
 
-    /**
-     * Find all users paginated.
-     *
-     * @param  Queueless\Organisation $organisation
-     * @param  int  $perPage
-     * @return Illuminate\Database\Eloquent\Collection|\Queueless\User[]
-     */
-    public function findAllPaginatedForOrganisation($organisation, $perPage = 8)
-    {
-        return $organisation->users()
-                    ->where('designation','!=','Admin')
-                    ->orderBy('created_at', 'desc')
-                    ->paginate($perPage);
-    }
-
    /**
-     * Find the user by the given id belonging to the given organisation.
+     * Find the user by the given id.
      *
      * @param  int  $id
-     * @param  \Queueless\Organisation $organisation
      * @return \Queueless\User
      */
-    public function findByIdForOrganisation($id, Organisation $organisation)
+    public function findById($id)
     {
-        $user = $organisation->users()->find($id);
+        $user = $this->model->find($id);
 
         if(is_null($user))
             throw new UserNotFoundException('The user with id as "'.$id.'" does not exist!');
@@ -69,75 +53,52 @@ class UserRepository extends AbstractRepository implements UserRepositoryInterfa
     }
 
     /**
-     * Find the user by the given email address from the given organisation.
+     * Find the user by the given email address.
      *
      * @param  int  $email
-     * @param  \Queueless\Organisation  $organisation
      * @return \Queueless\User
      */
-    public function findByEmailForOrganisation($email, Organisation $organisation)
+    public function findByEmail($email)
     {
-        $user = $organisation->users()->where('email',$email)->first();
+        $user = $this->model->where('email',$email)->first();
 
         if(is_null($user))
-            throw new UserNotFoundException("The user having email as $email does not exist, for {$organisation->name}");
+            throw new UserNotFoundException("The user having email as $email does not exist.");
 
         return $user;
     }
 
     /**
-     * Create a new user in the database.
+     * Add the given user to the organisation's queue.
      *
-     * @param  array $data
-     * @return \Queueless\User
+     * @param  \Queueless\User  $user
+     * @param  \Queueless\Organisation $organisation
+     * @return boolean
      */
-    public function createForOrganisation(array $data, Organisation $organisation)
+    public function addUserToQueueInOrganisation(User $user, Organisation $organisation)
     {
-        $user = $this->getNew();
-
-        $user->email        = $data['email'];
-        $user->fullname     = $data['fullname'];
-        $user->password     = $this->hasher->make($data['password']);
-        
-        if(isset($data['mobile']) && $data['mobile'])
-            $user->mobile  = $data['mobile'];
-
-        if(isset($data['address']) && $data['address'])
-            $user->address  = $data['address'];
-        
-        $organisation->users()->save($user);
-
-        return $user;
+        $data = $organisation->users()->lists('users.id')->toArray();
+        if($data)
+            array_push($data, $user->id);
+        else
+            $data = [$user->id];
+        return $organisation->users()->sync($data);
     }
 
     /**
-     * Update the user in the database.
+     * Get the first user from queue in the given organisation.
      *
-     * @param  \Queueless\User $user
-     * @param  array $data
+     * @param  \Queueless\Organisation $organisation
      * @return \Queueless\User
      */
-    public function edit(User $user, array $data)
+    public function getUserFromQueueInOrganisation(Organisation $organisation)
     {
+        $user = $organisation->users()->first();
 
-        //In setting page the user is not allowed to change his email or designation
-        if(isset($data['email']))
-            $user->email  = $data['email'];
-        
-        if(isset($data['designation']))
-            $user->designation  = $data['designation'];
-        
-        $user->fullname     = $data['fullname'];
-        $user->mobile  = $data['mobile'];
-        $user->address  = $data['address'];
+        if(is_null($user))
+            throw new UserNotFoundException("There are no users in the queue.");
 
-        //Sometimes the admin can update other details apart from the password
-        //Update the password only if the admin does it.
-        if(isset($data['password']))
-            $user->password = $this->hasher->make($data['password']);
-
-        $user->save();
-
+        $organisation->users()->detach($user->id);
         return $user;
     }
 }
