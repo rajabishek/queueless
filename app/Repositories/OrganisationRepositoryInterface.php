@@ -2,13 +2,7 @@
 
 namespace Queueless\Repositories;
 
-use Queueless\User;
 use Queueless\Organisation;
-use Queueless\Services\Forms\LoginForm;
-use Queueless\Services\Forms\AddEmployeeForm;
-use Queueless\Services\Forms\EmployeeUpdateForm;
-use Queueless\Services\Forms\SettingsForm;
-use Queueless\Services\Forms\ChangePasswordForm;
 
 interface OrganisationRepositoryInterface
 {
@@ -27,6 +21,14 @@ interface OrganisationRepositoryInterface
      * @return \Queueless\User
      */
     public function findByConfirmationCode($confirmationCode);
+
+    /**
+     * Does the organisation have users in the queue.
+     *
+     * @param  \Queueless\Organisation $organisation
+     * @return boolean
+     */
+    public function doesHaveUsersInQueue(Organisation $organisation);
 
     /**
      * Create a new organisation in the database.
