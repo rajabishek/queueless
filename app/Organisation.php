@@ -16,10 +16,20 @@ class Organisation extends Model
 	/**
 	 * An organisations has many employees.
 	 *
-	 * @return mixed
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
 	 */
 	public function employees()
     {
         return $this->hasMany('Queueless\Employee');
+    }
+
+    /**
+     * Many users can request for an apoointment with an organisation.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function users()
+    {
+        return $this->belongsToMany('Queueless\User')->withTimestamps();
     }
 }
