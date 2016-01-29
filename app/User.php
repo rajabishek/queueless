@@ -14,12 +14,22 @@ class User extends Model
     protected $hidden = ['password', 'remember_token'];
 
     /**
-     * A user belongs to an organisation.
+     * A user can have appointments with different employees.
      *
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function organisation()
+    public function employees()
     {
-        return $this->belongsTo('Queueless\Organisation');
+        return $this->belongsToMany('Queueless\Employee')->withTimestamps();
+    }
+
+    /**
+     * A user can request appointment with many organisations.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function organisations()
+    {
+        return $this->belongsToMany('Queueless\Organisation')->withTimestamps();
     }
 }
