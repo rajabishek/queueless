@@ -2,6 +2,7 @@
 
 namespace Queueless\Repositories;
 
+use Queueless\User;
 use Queueless\Employee;
 use Queueless\Organisation;
 
@@ -42,6 +43,31 @@ interface EmployeeRepositoryInterface
      * @return \Queueless\Employee
      */
     public function findByEmailForOrganisation($email, Organisation $organisation);
+
+    /**
+     * Find an available employee from the given organisation.
+     *
+     * @param  \Queueless\Organisation  $organisation
+     * @return \Queueless\Employee
+     */
+    public function findAvailableEmployeeFromOrganisation(Organisation $organisation);
+
+    /**
+     * Fix the appointment with the given user for the given employee.
+     *
+     * @param  \Queueless\User  $user
+     * @param  \Queueless\Employee $employee
+     * @return boolean
+     */
+    public function fixAppointmentWithUserForEmployee(User $user, Employee $employee);
+
+    /**
+     * Finish attending the surrent user for the given employee.
+     *
+     * @param  \Queueless\Employee $employee
+     * @return void
+     */
+    public function finishCurrentAttendingUserForEmployee(Employee $employee);
 
     /**
      * Create a new employee in the database.
