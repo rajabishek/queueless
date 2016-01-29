@@ -131,10 +131,26 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
      */
     public function fixAppointmentWithUserForEmployee(User $user, Employee $employee)
     {
+        $this->finishCurrentAttendingUserForEmployee($employee);
+        
         $employee->users()->attach($user->id);
         
         $employee->status = 'Busy';
         return $employee->save();
+    }
+
+    /**
+     * Finish attending the surrent user for the given employee.
+     *
+     * @param  \Queueless\Employee $employee
+     * @return void
+     */
+    public function finishCurrentAttendingUserForEmployee(Employee $employee)
+    {
+        $existingUser = $employee->users()->withPivot('status')->where('status','Attending')->first();
+
+        if($existingUser)
+            $employee->users()->updateExistingPivot($existingUser->id, ['status' => 'Done']);
     }
 
     /**
