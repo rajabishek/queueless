@@ -158,6 +158,7 @@ return [
         Queueless\Providers\RepositoryServiceProvider::class,
         Queueless\Providers\ReportingServiceProvider::class,
         Queueless\Providers\NavigationServiceProvider::class,
+        Queueless\Providers\SchedulerServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
         Thomaswelton\LaravelGravatar\LaravelGravatarServiceProvider::class,
         Laracasts\Flash\FlashServiceProvider::class,
