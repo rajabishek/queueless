@@ -2,6 +2,7 @@
 
 namespace Queueless\Repositories\Eloquent;
 
+use Queueless\User;
 use Queueless\Employee;
 use Queueless\Organisation;
 use Queueless\Repositories\EmployeeRepositoryInterface;
@@ -106,6 +107,37 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
     }
 
     /**
+     * Find an available employee from the given organisation.
+     *
+     * @param  \Queueless\Organisation  $organisation
+     * @return \Queueless\Employee
+     */
+    public function findAvailableEmployeeFromOrganisation(Organisation $organisation)
+    {
+        $employee = $organisation->employees()->where('status','Available')->first();
+        
+        if(is_null($employee))
+            throw new EmployeeNotFoundException("There are no available employee in the organisation.");
+
+        return $employee;
+    }
+
+    /**
+     * Fix the appointment with the given user for the given employee.
+     *
+     * @param  \Queueless\User  $user
+     * @param  \Queueless\Employee $employee
+     * @return boolean
+     */
+    public function fixAppointmentWithUserForEmployee(User $user, Employee $employee)
+    {
+        $employee->users()->attach($user->id);
+        
+        $employee->status = 'Busy';
+        return $employee->save();
+    }
+
+    /**
      * Create a new employee in the database.
      *
      * @param  array $data
@@ -151,9 +183,17 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
         if(isset($data['designation']))
             $employee->designation  = $data['designation'];
         
-        $employee->fullname     = $data['fullname'];
-        $employee->mobile  = $data['mobile'];
-        $employee->address  = $data['address'];
+        if(isset($data['fullname']))
+            $employee->fullname  = $data['fullname'];
+        
+        if(isset($data['mobile']))
+            $employee->mobile  = $data['mobile'];
+        
+        if(isset($data['address']))
+            $employee->address  = $data['address'];
+
+        if(isset($data['status']))
+            $employee->status  = $data['status'];
 
         //Sometimes the admin can update other details apart from the password
         //Update the password only if the admin does it.
