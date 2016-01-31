@@ -38,7 +38,9 @@ class Employee extends Authenticatable
      */
     public function users()
     {
-        return $this->belongsToMany('Queueless\User')->withTimestamps();
+        return $this->belongsToMany('Queueless\User')
+                    ->withPivot('attending')
+                    ->withTimestamps();
     }
 
     /**
