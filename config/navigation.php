@@ -24,6 +24,13 @@ return [
 			'active' => ['admin/employees/download'],
 			'glyphicon' => 'glyphicon glyphicon-download'
 		],
+
+		[
+			'label' => 'Queue',
+			'route' => 'admin.users.getQueue',
+			'active' => ['admin/users/queue'],
+			'glyphicon' => 'glyphicon glyphicon-option-vertical'
+		],
 	],
 
 	'adminmenu-bottom' => [
