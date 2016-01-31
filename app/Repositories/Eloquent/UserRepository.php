@@ -101,4 +101,44 @@ class UserRepository extends AbstractRepository implements UserRepositoryInterfa
         $organisation->users()->detach($user->id);
         return $user;
     }
+
+    /**
+     * Get all users paginated from the queue.
+     *
+     * @param  Queueless\Organisation $organisation
+     * @param  int  $perPage
+     * @return Illuminate\Database\Eloquent\Collection|\Queueless\Employee[]
+     */
+    public function getUsersFromQueuePaginatedForOrganisation(Organisation $organisation, $perPage = 8)
+    {
+        return $organisation->users()
+                            ->orderBy('created_at', 'asc')
+                            ->paginate($perPage);;
+    }
+
+    /**
+     * Get the attending users for the given organisation.
+     *
+     * @param  Queueless\Organisation $organisation
+     * @return \Queueless\Employee[]
+     */
+    public function getUsersInProgressForOrganisation(Organisation $organisation)
+    {
+        $employees = $organisation->employees()->with('users')->orderBy('created_at','desc')->get();
+        
+        $attendingUsers = [];
+
+        foreach ($employees as $employee) {
+            $user = $employee->users()->where('attending',true)->first();
+            if($user)
+            {
+                $object = new \stdClass();
+                $object->user = $user;
+                $object->employee = $employee;
+                array_push($attendingUsers, $object);
+            }
+        }
+
+        return collect($attendingUsers);
+    }
 }
