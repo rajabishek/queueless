@@ -20,7 +20,9 @@ class User extends Model
      */
     public function employees()
     {
-        return $this->belongsToMany('Queueless\Employee')->withTimestamps();
+        return $this->belongsToMany('Queueless\Employee')
+                    ->withPivot('attending')
+                    ->withTimestamps();
     }
 
     /**
