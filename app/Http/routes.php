@@ -55,11 +55,13 @@ Route::group(['domain' => '{domain}.' . env('APP_DOMAIN','queueless.com'),'middl
             Route::post('settings/changePassword',['as' => 'admin.settings.changePassword','uses' => 'SettingsController@changePassword']);
             Route::post('settings/changeProfile',['as' => 'admin.settings.changeProfile','uses' => 'SettingsController@changeProfile']);
             Route::resource('settings', 'SettingsController',['only' => ['index','store']]);
+
+            Route::get('users/queue',['as' => 'admin.users.getQueue','uses' => 'UsersController@getQueue']);
+            Route::resource('users','UsersController');
         });
 
         Route::get('employees/{id}/appointments',['as' => 'employees.appointments.request','uses' => 'AppointmentController@next']);
         Route::get('users/{id}/appointments',['as' => 'users.appointments.request','uses' => 'AppointmentController@request']);
-        Route::resource('users','UsersController');
     });
 
     Route::group(['namespace' => 'Api\v1','prefix' => 'api/v1'], function ($app)
