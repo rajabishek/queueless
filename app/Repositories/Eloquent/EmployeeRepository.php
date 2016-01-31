@@ -114,10 +114,13 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
      */
     public function findAvailableEmployeeFromOrganisation(Organisation $organisation)
     {
-        $employee = $organisation->employees()->where('status','Available')->first();
+        $employee = $organisation->employees()
+                                 ->where('designation','Employee')
+                                 ->where('status','Available')
+                                 ->first();
         
         if(is_null($employee))
-            throw new EmployeeNotFoundException("There are no available employee in the organisation.");
+            throw new EmployeeNotFoundException("There are no available employees in the organisation.");
 
         return $employee;
     }
@@ -147,10 +150,10 @@ class EmployeeRepository extends AbstractRepository implements EmployeeRepositor
      */
     public function finishCurrentAttendingUserForEmployee(Employee $employee)
     {
-        $existingUser = $employee->users()->withPivot('status')->where('status','Attending')->first();
+        $existingUser = $employee->users()->where('attending',true)->first();
 
         if($existingUser)
-            $employee->users()->updateExistingPivot($existingUser->id, ['status' => 'Done']);
+            $employee->users()->updateExistingPivot($existingUser->id, ['attending' => false]);
     }
 
     /**
