@@ -1,6 +1,6 @@
 <?php
 
-namespace Queueless\Http\Controllers;
+namespace Queueless\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use Queueless\Http\Requests;
@@ -35,6 +35,21 @@ class UsersController extends Controller
     public function index($domain, Request $request)
     {
     	return 'cool';
+    }
+
+    /**
+     * Get the users waiting in the queue.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getQueue($domain, Request $request)
+    {
+        $organisation = $request->user()->organisation;
+        $users = $this->users->getUsersFromQueuePaginatedForOrganisation($organisation);
+
+        $attendingUsers = $this->users->getUsersInProgressForOrganisation($organisation);
+
+        return view('admin.users.queue',compact('users','domain','attendingUsers'));
     }
 
     /**
