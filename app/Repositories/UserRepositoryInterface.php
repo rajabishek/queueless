@@ -39,4 +39,21 @@ interface UserRepositoryInterface
      * @return \Queueless\User
      */
     public function getUserFromQueueInOrganisation(Organisation $organisation);
+
+    /**
+     * Get all users paginated from the queue.
+     *
+     * @param  Queueless\Organisation $organisation
+     * @param  int  $perPage
+     * @return Illuminate\Database\Eloquent\Collection|\Queueless\Employee[]
+     */
+    public function getUsersFromQueuePaginatedForOrganisation(Organisation $organisation, $perPage = 8);
+
+    /**
+     * Get the attending users for the given organisation.
+     *
+     * @param  Queueless\Organisation $organisation
+     * @return \Queueless\Employee[]
+     */
+    public function getUsersInProgressForOrganisation(Organisation $organisation);
 }
