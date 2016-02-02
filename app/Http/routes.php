@@ -56,6 +56,7 @@ Route::group(['domain' => '{domain}.' . env('APP_DOMAIN','queueless.com'),'middl
             Route::post('settings/changeProfile',['as' => 'admin.settings.changeProfile','uses' => 'SettingsController@changeProfile']);
             Route::resource('settings', 'SettingsController',['only' => ['index','store']]);
 
+            Route::get('users/api/queue',['as' => 'admin.users.api.getQueue','uses' => 'UsersController@getQueueJson']);
             Route::get('users/queue',['as' => 'admin.users.getQueue','uses' => 'UsersController@getQueue']);
             Route::resource('users','UsersController');
         });
@@ -68,10 +69,7 @@ Route::group(['domain' => '{domain}.' . env('APP_DOMAIN','queueless.com'),'middl
     {   
         Route::group(['namespace' => 'Auth'], function ($app)
         {
-            Route::post('register','AuthController@postRegister');
-            Route::post('login','AuthController@postLogin');
-            Route::get('user', 'AuthController@getUser');
-            Route::get('token/validate', 'AuthController@validateToken');
+            Route::post('accounts/login', ['as' => 'api.v1.auth.postLogin','uses' => 'AuthController@postLogin']);
         });
     });
 
