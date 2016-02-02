@@ -42,14 +42,23 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getQueue($domain, Request $request)
+    public function getQueueJson($domain, Request $request)
     {
         $organisation = $request->user()->organisation;
-        $users = $this->users->getUsersFromQueuePaginatedForOrganisation($organisation);
+        $users = $this->users->getUsersFromQueueForOrganisation($organisation)->toArray();
 
         $attendingUsers = $this->users->getUsersInProgressForOrganisation($organisation);
+        return compact('users','attendingUsers');
+    }
 
-        return view('admin.users.queue',compact('users','domain','attendingUsers'));
+    /**
+     * Get the users waiting in the queue.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getQueue($domain, Request $request)
+    {
+        return view('admin.users.queue',compact('domain'));
     }
 
     /**
