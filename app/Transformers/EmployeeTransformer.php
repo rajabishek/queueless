@@ -2,21 +2,25 @@
 
 namespace Queueless\Transformers;
 
-use Queueless\User;
+use Queueless\Employee;
 
 class EmployeeTransformer extends Transformer 
 {
     /**
-     * Transform the given user
+     * Transform the given employee
      *
-     * @param array $user
+     * @param array $employee
      * @return array
      */
-    public function transform($user)
+    public function transform($employee)
     {
         return [
-            'name' => $user['name'],
-            'email' => $user['email'],
+            'id' => intval($employee['id']),
+            'email' => $employee['email'],
+            'fullname' => $employee['fullname'],
+            'address' => $employee['address'],
+            'mobile' => $employee['mobile'],
+            'designation' => $employee['designation']
         ];
     }
 }
