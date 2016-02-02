@@ -9,6 +9,9 @@ use Queueless\Repositories\UserRepositoryInterface;
 use Queueless\Repositories\EmployeeRepositoryInterface;
 use Queueless\Repositories\OrganisationRepositoryInterface;
 use Queueless\Exceptions\EmployeeNotFoundException;
+use Queueless\Events\Users\NewAppointmentWasRequested;
+use Queueless\Events\Employees\NextAppointmentWasRequested;
+
 
 class QueueScheduler implements Scheduler
 {
@@ -82,6 +85,8 @@ class QueueScheduler implements Scheduler
             $this->addUserToQueue($user);
 		else
 			$this->tryAssigningAnAvailableEmployeeForUser($user);
+
+        event(new NewAppointmentWasRequested($this->organisation));
     }
 
     /**
@@ -101,6 +106,8 @@ class QueueScheduler implements Scheduler
         }
         else
             $this->markEmployeeAsAvailable($employee);
+
+        event(new NextAppointmentWasRequested($this->organisation));
     }
 
     /**
