@@ -107,13 +107,13 @@ class UserRepository extends AbstractRepository implements UserRepositoryInterfa
      *
      * @param  Queueless\Organisation $organisation
      * @param  int  $perPage
-     * @return Illuminate\Database\Eloquent\Collection|\Queueless\Employee[]
+     * @return \Queueless\Employee[]
      */
-    public function getUsersFromQueuePaginatedForOrganisation(Organisation $organisation, $perPage = 8)
+    public function getUsersFromQueueForOrganisation(Organisation $organisation)
     {
         return $organisation->users()
                             ->orderBy('created_at', 'asc')
-                            ->paginate($perPage);;
+                            ->get();
     }
 
     /**
